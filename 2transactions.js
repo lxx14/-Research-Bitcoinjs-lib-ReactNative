@@ -13,26 +13,26 @@ const App = () => {
   const phrase_2 = 'test2 phrase2 www2 qqq2 rtye2 kgjgy2 kdsdb2 hgkgo2 ngyv2 nghgdft2 jgydcf2 nfjbdt2';                           // фраза из которой сделаем сидовую фразу
   const seed_2 = bip39.mnemonicToSeedSync(phrase_2);           // делаем сидовую фразу
   var ourWallet_2 = bitcoin.bip32.fromSeed(seed_2, TestNet);   // создаем кошелек с ключами прив/публ из сидовой фразы, второй параметр - сеть, по дефолту - mainnet, ставим тест
-  console.log('ourWallet-------->', ourWallet_2);
+  //console.log('ourWallet-------->', ourWallet_2);
   const { address: address_2 } = bitcoin.payments.p2pkh({ pubkey: ourWallet_2.publicKey, network: TestNet });  // адресс кошелька, если указываем тестнет - то он тестовый. иначе приватный
   const publicKey_2 = ourWallet_2.publicKey.toString('hex');   // публичный ключ кошелька (он же адресс), в формате строки-хэша (вдруг пригодится:).
   let privateKey_2 = ourWallet_2.toWIF();   // приватный ключ кошелька, закодированный в WIF
-  console.log(`Public key_2----------> ${publicKey_2}`);
-  console.log(`Private key_2--------> ${privateKey_2}`);
-  console.log(`Adress_2-------------> ${address_2}`);
+  // console.log(`Public key_2----------> ${publicKey_2}`);
+  // console.log(`Private key_2--------> ${privateKey_2}`);
+  // console.log(`Adress_2-------------> ${address_2}`);
 
   //-------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
   const phrase = 'test phrase www qqq rtye kgjgy kdsdb hgkgo ngyv nghgdft jgydcf nfjbdt';                           // фраза из которой сделаем сидовую фразу
   const seed = bip39.mnemonicToSeedSync(phrase);           // делаем сидовую фразу
   var ourWallet = bitcoin.bip32.fromSeed(seed, TestNet);   // создаем кошелек с ключами прив/публ из сидовой фразы, второй параметр - сеть, по дефолту - mainnet, ставим тест
-  console.log('ourWallet-------->', ourWallet);
+  //console.log('ourWallet-------->', ourWallet);
   const { address } = bitcoin.payments.p2pkh({ pubkey: ourWallet.publicKey, network: TestNet });  // адресс кошелька, если указываем тестнет - то он тестовый. иначе приватный
   const publicKey = ourWallet.publicKey.toString('hex');   // публичный ключ кошелька (он же адресс), в формате строки-хэша (вдруг пригодится:).
   let privateKey = ourWallet.toWIF();   // приватный ключ кошелька, закодированный в WIF
-  console.log(`Public key----------> ${publicKey}`);
-  console.log(`Private key--------> ${privateKey}`);
-  console.log(`Adress-------------> ${address}`);
+  // console.log(`Public key----------> ${publicKey}`);
+  // console.log(`Private key--------> ${privateKey}`);
+  // console.log(`Adress-------------> ${address}`);
 
   const txId_first = '68d915a19d50b2139139dcdfced41eba509a654ec93c65c9793b6bdd0f73064b';
   const txId_second = '5b2e76f3916e7e10ca55ef638e668f8dc0a01fed5acb10535f456d17c8a021cb';
@@ -60,7 +60,7 @@ const App = () => {
 
   tx_new.sign(0, privateSign);   // подписываем нашу транзакцию. 0 - Первый аргумент, vin, относится к индексу входных данных, с которыми мы подписываемся.
   // В этом случае, поскольку мы добавили только 1 вход, наш vin равен 0, второй аргумент - приватная подпись
-    tx_new.sign(1, privateSign);
+  tx_new.sign(1, privateSign);
   let tx_new_hex = tx_new.build().toHex()  // в конце создаем транзакцию из указанных выше инпута (откуда берем деньги) и аутпутов (на какие адреса отправляем),
   //  хэшируем ее в шестнадцатеричное значение
   // проверить правильность транзакции можно тут: https://live.blockcypher.com/btc-testnet/decodetx/  (вставляем получившийся хэш сюда, декодируем)
@@ -70,10 +70,19 @@ const App = () => {
   //------------------------------------------------------------------------------------------------------
   // все эти шаги можно делать не в тестовой сети а в реально - если не указывать testNet.
   // сервисы для проверки в реальной сети:
-  // https://www.blockchain.com/explorer               (адресс со всеми транзакциями, грубо говоря аккаунт)
+  // https://www.blockchain.com/explorer               (адресс со всеми транзакциями, грубо говоря кошелек)
   // https://www.blockchain.com/btc/decode-tx          (сервис для декодирования хэша готовой транзакции tx_hex и проверки валидная она или нет)
 
   console.log('transaction------------------->', tx_new_hex)
+
+  //-----------------------------------------------------------------------------------------------------
+
+  // далее через нужное РЕСТ АПИ (axios, fetch и т.д.) отправляем зашифрованную (в hex формате) транзакцию на тестовый сервер. Пример запроса:
+  // post('https://api.blockcypher.com/v1/bcy/test/txs/push', JSON.stringify(tx_new_hex)) (используем метод POST и передаем как body JSON, содержащий нашу транзакцию в hex-шифровании)
+  // если все ок, мы получаем декодированную транзакцию и HTTP статус 201:
+  // пример с запросом выше: post('https://api.blockcypher.com/v1/bcy/test/txs/push', JSON.stringify(pushtx)).then(tx=>console.log(tx));
+  // заходим на тестовый сервер https://live.blockcypher.com/btc-testnet/ в свой кошелек и проверяем совершилась ли транзакция
+  // профит:)
 
   return (
     <>
